@@ -672,7 +672,7 @@ def main():
                 if map_40 > best_map:
                     torch.save(
                         retinanet.state_dict(),
-                        os.path.join(args.logdir, f"retinanet_resnet{args.depth}_best.pt"),
+                        os.path.join(args.logdir, f"retinanet_resnet{args.depth}_best.pth"),
                     )
                     best_map = map_40
                 writer.add_scalar("eval/map@0.4", map_40, epoch_num * len(dataloader_train))

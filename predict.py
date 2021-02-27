@@ -11,6 +11,8 @@ import glob
 import argparse
 import torch
 from torch.utils.data import DataLoader
+import torchvision
+from torchvision import transforms, utils, datasets
 
 from retinanet.dataloader import ImageDirectory, custom_collate
 from retinanet.utils import get_logger
@@ -44,8 +46,12 @@ if __name__ == "__main__":
     if not opt.output.endswith(".json"):
         raise AttributeError(f"output must be a path to `json` file, got {opt.output}")
 
-    dataset = ImageDirectory(opt.image_dir)
+    dataset = ImageDirectory(opt.image_dir, "png")
+    
     logger.info(f"running inference on {len(dataset)} images (batch-size = {opt.batch_size}).")
+
+
+
     loader = DataLoader(
         dataset,
         batch_size=opt.batch_size,
@@ -94,17 +100,19 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError
 
-    device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
-    logger.info(f"using device {device}")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    ckpt = torch.load(opt.weights, map_location=device)  # load checkpoint
 
-    ckpt = torch.load(opt.weights, map_location=device)
-    model.load_state_dict(ckpt.state_dict())
+    model.load_state_dict(ckpt, strict=False)
+    
     model.to(device)
     model.eval()
     logger.info(f"successfully loaded saved checkpoint.")
 
     preds = dict()
     for i, (batch, filenames) in tqdm(enumerate(loader), total=len(loader)):
+        print(i, batch, filenames)
+        aaaaa
         with torch.no_grad():
             img_id, confs, classes, bboxes = model(batch[0].float().cuda())
         img_id = img_id.cpu().numpy().tolist()

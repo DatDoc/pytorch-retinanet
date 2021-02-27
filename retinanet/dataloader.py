@@ -547,15 +547,17 @@ class AspectRatioBasedSampler(Sampler):
 
 
 class ImageDirectory(Dataset):
-    def __init__(self, image_dir, ext="jpg"):
+    def __init__(self, image_dir, ext="png"):
         self.images = glob.glob(os.path.join(image_dir, f"*.{ext}"))
         self.transforms = torchvision.transforms.Compose(
             [
                 #                   torchvision.transforms.Resize((512, 512)),
+
                 torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                ),
+                # torchvision.transforms.Normalize(
+                #     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                # ),
+                torchvision.transforms.Normalize([0.5], [0.5])
             ]
         )
 
