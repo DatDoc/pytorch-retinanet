@@ -665,22 +665,22 @@ def main():
                     with open(os.path.join(args.logdir, "val_bbox_results.json"), "w") as f:
                         json.dump(results, f, indent=4)
                     stats = coco_eval.evaluate_coco(dataset_val, val_image_ids, args.logdir)
-                    map_avg, map_50, map_75, map_small = stats[:4]
+                    map_40, map_40s, map_40m, map_40l = stats[0], stats[3], stats[4], stats[5]
                 else:
-                    map_avg, map_50, map_75, map_small = [-1] * 4
+                    map_40, map_40s, map_40m, map_40l = [-1] * 4
 
-                if map_50 > best_map:
+                if map_40 > best_map:
                     torch.save(
                         retinanet.state_dict(),
                         os.path.join(args.logdir, f"retinanet_resnet{args.depth}_best.pt"),
                     )
-                    best_map = map_50
-                writer.add_scalar("eval/map@0.5:0.95", map_avg, epoch_num * len(dataloader_train))
-                writer.add_scalar("eval/map@0.5", map_50, epoch_num * len(dataloader_train))
-                writer.add_scalar("eval/map@0.75", map_75, epoch_num * len(dataloader_train))
-                writer.add_scalar("eval/map_small", map_small, epoch_num * len(dataloader_train))
+                    best_map = map_40
+                writer.add_scalar("eval/map@0.4", map_40, epoch_num * len(dataloader_train))
+                writer.add_scalar("eval/map@0.4small", map_40s, epoch_num * len(dataloader_train))
+                writer.add_scalar("eval/map@0.4medium", map_40m, epoch_num * len(dataloader_train))
+                writer.add_scalar("eval/map@0.4large", map_40l, epoch_num * len(dataloader_train))
                 logger.info(
-                    f"Epoch: {epoch_num} | lr = {lr:.6f} |map@0.5:0.95 = {map_avg:.4f} | map@0.5 = {map_50:.4f} | map@0.75 = {map_75:.4f} | map-small = {map_small:.4f}"
+                    f"Epoch: {epoch_num} | lr = {lr:.6f} |map@0.4 = {map_40:.4f} | map@0.4small = {map_40s:.4f} | map@0.4medium = {map_40m:.4f} | map@0.4large = {map_40l:.4f}"
                 )
 
         elif args.dataset == "csv" and args.csv_val is not None:
